@@ -9,8 +9,7 @@ public class SideWalls : MonoBehaviour
         if (hitInfo.tag == "Ball")
         {
             string wallName = transform.name;
-            GameManager.Score(wallName);
-            hitInfo.gameObject.SendMessage("RestartGame", null, SendMessageOptions.RequireReceiver);
+           // hitInfo.gameObject.SendMessage("RestartGame", null, SendMessageOptions.RequireReceiver);
         }
     }
 

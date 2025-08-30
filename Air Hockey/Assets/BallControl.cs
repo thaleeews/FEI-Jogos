@@ -4,8 +4,38 @@ using UnityEngine;
 
 public class BallControl : MonoBehaviour
 {
+    public GameManager GameManagerInstance;
+    public static bool WasGoal { get; private set;}
     private Rigidbody2D rb2d;
-    public float speed = 10.0f;
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        rb2d = GetComponent<Rigidbody2D>(); // Inicializa o objeto bola
+        WasGoal = false;
+    }
+
+    private void OnTriggerEnter2D(Collider2D hitInfo) {
+        if(!WasGoal) {
+            if(hitInfo.tag == "GolAi") {
+                GameManagerInstance.Increment(GameManager.Score.PlayerScore);
+                WasGoal = true;
+                StartCoroutine(ResetPuck());
+            }
+            else if(hitInfo.tag == "GolPlayer") {
+                GameManagerInstance.Increment(GameManager.Score.AiScore);
+                WasGoal = true;
+                StartCoroutine(ResetPuck());
+            }
+        }
+    }
+
+    private IEnumerator ResetPuck() {
+        yield return new WaitForSecondsRealtime(1);
+        WasGoal = false;
+        rb2d.linearVelocity = rb2d.position = new Vector2(0,0);
+    }
+    /*public float speed = 10.0f;
 
     // inicializa a bola randomicamente para esquerda ou direita
     void GoBall(){                      
@@ -40,5 +70,5 @@ public class BallControl : MonoBehaviour
     void Update()
     {
         
-    }
+    }*/
 }

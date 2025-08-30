@@ -1,12 +1,23 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
-    public static int PlayerScore1 = 0; // Pontuação do player 1
-    public static int PlayerScore2 = 0; // Pontuação do player 2
+    public enum Score {
+        AiScore, PlayerScore
+    }
 
+    public Text AiScoreTxt, PlayerScoreTxt;
+    private int AiScore, PlayerScore;
+
+    public void Increment(Score whichScore) {
+        if (whichScore == Score.AiScore) 
+            AiScoreTxt.text = (++AiScore).ToString();
+        else
+            PlayerScoreTxt.text = (++PlayerScore).ToString();
+    }
+
+    /*
     public GUISkin layout;              // Fonte do placar
     GameObject theBall;                 // Referência ao objeto bola
 
@@ -15,17 +26,6 @@ public class GameManager : MonoBehaviour
     {
         theBall = GameObject.FindGameObjectWithTag("Ball"); // Busca a referência da bola
 
-    }
-
-    // incrementa a potuação
-    public static void Score (string wallID) {
-        if (wallID == "topWallGoal")
-        {
-            PlayerScore1++;
-        } else if (wallID == "bottomWallGoal")
-        {
-            PlayerScore2++;
-        }
     }
 
     // Gerência da pontuação e fluxo do jogo
@@ -56,5 +56,5 @@ public class GameManager : MonoBehaviour
     void Update()
     {
         
-    }
+    }*/
 }
