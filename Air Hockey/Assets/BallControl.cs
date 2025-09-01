@@ -6,7 +6,10 @@ public class BallControl : MonoBehaviour
 {
     public GameManager GameManagerInstance;
     public static bool WasGoal { get; private set;}
+    public float MaxSpeed;
+
     private Rigidbody2D rb2d;
+    public AudioManager audioManager;
 
     // Start is called before the first frame update
     void Start()
@@ -20,20 +23,30 @@ public class BallControl : MonoBehaviour
             if(hitInfo.tag == "GolAi") {
                 GameManagerInstance.Increment(GameManager.Score.PlayerScore);
                 WasGoal = true;
+                audioManager.PlayGoal();
                 StartCoroutine(ResetPuck());
             }
             else if(hitInfo.tag == "GolPlayer") {
                 GameManagerInstance.Increment(GameManager.Score.AiScore);
                 WasGoal = true;
+                audioManager.PlayGoal();
                 StartCoroutine(ResetPuck());
             }
         }
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision) {
+        audioManager.PlayPuckCollision();
     }
 
     private IEnumerator ResetPuck() {
         yield return new WaitForSecondsRealtime(1);
         WasGoal = false;
         rb2d.linearVelocity = rb2d.position = new Vector2(0,0);
+    }
+
+    private void FixedUpdate() {
+        rb2d.linearVelocity = Vector2.ClampMagnitude(rb2d.linearVelocity, MaxSpeed);
     }
     /*public float speed = 10.0f;
 
