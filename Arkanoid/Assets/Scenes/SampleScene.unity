@@ -942,6 +942,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   txtScore: {fileID: 1001661052}
   txtStart: {fileID: 1441724630}
+  txtLose: {fileID: 1899522332}
   gameState: 0
   Ball: {fileID: 200300915}
   Player: {fileID: 204183283}
