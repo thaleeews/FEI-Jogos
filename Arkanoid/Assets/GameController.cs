@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public enum GameState { Stop, Play, Win, GameOver, Pause };
 public class GameController : MonoBehaviour
@@ -11,58 +12,150 @@ public class GameController : MonoBehaviour
     private GameObject Ball;
     [SerializeField]
     private GameObject Player;
-    private float score;
+    
+    [Header("Level System")]
+    public string[] levelScenes = {"Level1", "Level2", "Level3", "VictoryScene"};
+    
+    private int score;
 
     private void Awake() {
-        if (instance == null) {
-            instance = this;
+        // Verificar se já existe uma instância
+        if (instance != null && instance != this) {
+            Destroy(gameObject); // Destruir este GameObject duplicado
+            return;
         }
-        else {
-            if (instance != this) {
-                Destroy(this);
-            }
+        instance = this;
+    }
+
+    private void OnDestroy() {
+        if (instance == this) {
+            instance = null; // Limpar a instância quando destruído
         }
     }
+    
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         gameState = GameState.Stop;
         txtLose.gameObject.SetActive(false);
     }
+    
 
     // Update is called once per frame
     void Update()
     {
         txtScore.text = "Score: " + this.score;
+        
+        if (gameState == GameState.Play) {
+            CheckWinCondition();
+        }
+
         if (gameState != GameState.Play) {
             if (Input.GetKey(KeyCode.Space)) {
                 StartGame();
                 txtStart.gameObject.SetActive(false);
             }
+            // Restart completo com R
+            if (Input.GetKey(KeyCode.R)) {
+                RestartGame();
+            }
         }
         if (gameState == GameState.GameOver) {
             txtLose.gameObject.SetActive(true);
+            txtLose.text = "GAME OVER\n\nESPAÇO - Tentar novamente\nR - Reiniciar jogo";
         }
     }
 
-    public void AddPoints(float valor) {
+    public void AddPoints(int valor) {
         this.score += valor;
     }
+
+    public void CheckWinCondition() {
+        GameObject[] remainingBlocks = GameObject.FindGameObjectsWithTag("Bloco");
+        
+        if (remainingBlocks.Length == 0) {
+            LoadNextLevel();
+        }
+    }
+
+    void LoadNextLevel() {
+        string currentSceneName = SceneManager.GetActiveScene().name;
+        
+        // Determinar próxima fase baseada na cena atual
+        switch(currentSceneName) {
+            case "Level1":
+                try {
+                    SceneManager.LoadScene("Level2");
+                } catch (System.Exception e) {
+                    ShowCompleteMessage();
+                }
+                break;
+            case "Level2":
+                SceneManager.LoadScene("Level3");
+                break;
+            case "Level3":
+                SceneManager.LoadScene("VictoryScene");
+                break;
+            default:
+                RestartGame(); // Se não reconhecer a cena, reiniciar
+                break;
+        }
+    }
+
+    public void RestartGame() {
+        // Sistema simples: apenas resetar score e voltar para Level1
+        score = 0;
+        SceneManager.LoadScene("Level1");
+    }
+
 
     public void StartGame() {
         if (gameState == GameState.Stop) {
             gameState = GameState.Play;
             score = 0;
-            Ball.GetComponent<Ball>().StartBall();
+            // Encontrar Ball pela tag se a referência estiver nula
+            if (Ball == null) {
+                GameObject ballObj = GameObject.FindWithTag("Ball");
+                if (ballObj != null) Ball = ballObj;
+            }
+            
+            if (Ball != null) {
+                Ball.GetComponent<Ball>().StartBall();
+            }
         }
         else if (gameState == GameState.GameOver) {
             txtLose.gameObject.SetActive(false);
             gameState = GameState.Play;
             score = 0;
-            BlockController.instance.DestroyAllByTag();
-            BlockController.instance.CreateBlock();
-            Player.GetComponent<Raquete>().StartRaquete();
-            Ball.GetComponent<Ball>().StartBall();
+            
+            // Limpar e recriar blocos
+            if (BlockController.instance != null) {
+                BlockController.instance.DestroyAllByTag();
+                BlockController.instance.CreateLevelBlocks();
+            }
+            
+            // Resetar posições
+            if (Player != null) {
+                Player.GetComponent<Raquete>().StartRaquete();
+            }
+            
+            if (Ball != null) {
+                Ball.GetComponent<Ball>().StartBall();
+            }
         }
+        else if (gameState == GameState.Win) {
+            if (Input.GetKey(KeyCode.Space)) {
+                RestartGame();
+            }
+            if (Input.GetKey(KeyCode.R)) {
+                RestartGame();
+            }
+        }
+    }
+    
+    void ShowCompleteMessage() {
+        gameState = GameState.Win;
+        txtStart.text = "🏆 PARABÉNS!\nVocê completou a fase!\n\n📋 Para continuar:\n1. Crie Level2\n2. Adicione às Build Settings\n\nESPAÇO - Reiniciar\nR - Novo jogo";
+        txtStart.gameObject.SetActive(true);
     }
 }
