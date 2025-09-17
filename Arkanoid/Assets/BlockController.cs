@@ -70,7 +70,7 @@ public class BlockController : MonoBehaviour
     
     void CreateLevel2Blocks() {
         // Level 2: Layout médio
-        CreateBlockGrid(4, 8, -5.2f, 0.3f); // 4 linhas, 8 colunas
+        CreateBlockGrid(2, 5, -5.2f, 0.3f); // 2 linhas, 5 colunas
     }
     
     void CreateLevel3Blocks() {

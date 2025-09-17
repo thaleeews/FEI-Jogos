@@ -62,7 +62,16 @@ public class GameController : MonoBehaviour
         }
         if (gameState == GameState.GameOver) {
             txtLose.gameObject.SetActive(true);
-            txtLose.text = "GAME OVER\n\nESPAÇO - Tentar novamente\nR - Reiniciar jogo";
+            txtLose.text = "GAME OVER";
+            txtStart.gameObject.SetActive(true);
+            txtStart.text = "Pressione Space para reiniciar";
+        }
+        else if (gameState == GameState.Win) {
+            Ball.GetComponent<Ball>().StopBall();
+            txtLose.gameObject.SetActive(true);
+            txtLose.text = "Parabéns! Você venceu!";
+            txtStart.gameObject.SetActive(true);
+            txtStart.text = "Pressione Space para reiniciar";
         }
     }
 
@@ -91,10 +100,7 @@ public class GameController : MonoBehaviour
                 }
                 break;
             case "Level2":
-                SceneManager.LoadScene("Level3");
-                break;
-            case "Level3":
-                SceneManager.LoadScene("VictoryScene");
+                gameState = GameState.Win;
                 break;
             default:
                 RestartGame(); // Se não reconhecer a cena, reiniciar
@@ -150,6 +156,10 @@ public class GameController : MonoBehaviour
             if (Input.GetKey(KeyCode.R)) {
                 RestartGame();
             }
+        }
+        else if (gameState == GameState.Win) {
+            txtLose.gameObject.SetActive(false);
+            SceneManager.LoadScene("Level1");
         }
     }
     

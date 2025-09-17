@@ -38,7 +38,7 @@ public class Raquete : MonoBehaviour
             }
             transform.position = pos;               // Atualiza a posição da raquete
         }
-        else if (GameController.instance.gameState == GameState.GameOver) {
+        else if (GameController.instance.gameState == GameState.GameOver || GameController.instance.gameState == GameState.Win) {
             Vector2 pararRaquete = new Vector2(0,0);
             rb2d.linearVelocity = pararRaquete;
         }
