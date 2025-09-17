@@ -2,10 +2,10 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
-public enum GameState { Stop, Play, Win, GameOver, Pause };
+public enum GameState { Stop, Play, Win, GameOver, Pause, LessLife };
 public class GameController : MonoBehaviour
 {
-    public Text txtScore, txtStart, txtLose;
+    public Text txtScore, txtStart, txtLose, txtVida;
     public static GameController instance;
     public GameState gameState;
     [SerializeField]
@@ -17,6 +17,7 @@ public class GameController : MonoBehaviour
     public string[] levelScenes = {"Level1", "Level2", "Level3", "VictoryScene"};
     
     private int score;
+    private int vidas;
 
     private void Awake() {
         // Verificar se já existe uma instância
@@ -25,7 +26,9 @@ public class GameController : MonoBehaviour
             return;
         }
         instance = this;
+        DontDestroyOnLoad(gameObject); // Mantém o GameController entre cenas
     }
+
 
     private void OnDestroy() {
         if (instance == this) {
@@ -45,12 +48,13 @@ public class GameController : MonoBehaviour
     void Update()
     {
         txtScore.text = "Score: " + this.score;
+        txtVida.text = "Vidas: " + this.vidas;
         
         if (gameState == GameState.Play) {
             CheckWinCondition();
         }
 
-        if (gameState != GameState.Play) {
+        else if (gameState != GameState.Play) {
             if (Input.GetKey(KeyCode.Space)) {
                 StartGame();
                 txtStart.gameObject.SetActive(false);
@@ -60,9 +64,13 @@ public class GameController : MonoBehaviour
                 RestartGame();
             }
         }
-        if (gameState == GameState.GameOver) {
+        else if (gameState == GameState.GameOver) {
             txtLose.gameObject.SetActive(true);
-            txtLose.text = "GAME OVER\n\nESPAÇO - Tentar novamente\nR - Reiniciar jogo";
+            txtLose.text = "GAME OVER - Pressione Space para tentar novamente";
+        }
+        else if (gameState == GameState.LessLife) {
+            txtLose.gameObject.SetActive(true);
+            txtLose.text = "-1 VIDA - Pressione Space para continuar";
         }
     }
 
@@ -70,10 +78,16 @@ public class GameController : MonoBehaviour
         this.score += valor;
     }
 
+    public int RemoveLife() {
+        this.vidas -= 1;
+        return this.vidas;
+    }
+
     public void CheckWinCondition() {
         GameObject[] remainingBlocks = GameObject.FindGameObjectsWithTag("Bloco");
         
         if (remainingBlocks.Length == 0) {
+            gameState = GameState.Stop;
             LoadNextLevel();
         }
     }
@@ -105,6 +119,7 @@ public class GameController : MonoBehaviour
     public void RestartGame() {
         // Sistema simples: apenas resetar score e voltar para Level1
         score = 0;
+        vidas = 3;
         SceneManager.LoadScene("Level1");
     }
 
@@ -113,6 +128,7 @@ public class GameController : MonoBehaviour
         if (gameState == GameState.Stop) {
             gameState = GameState.Play;
             score = 0;
+            vidas = 3;
             // Encontrar Ball pela tag se a referência estiver nula
             if (Ball == null) {
                 GameObject ballObj = GameObject.FindWithTag("Ball");
@@ -127,6 +143,7 @@ public class GameController : MonoBehaviour
             txtLose.gameObject.SetActive(false);
             gameState = GameState.Play;
             score = 0;
+            vidas = 3;
             
             // Limpar e recriar blocos
             if (BlockController.instance != null) {
@@ -149,6 +166,17 @@ public class GameController : MonoBehaviour
             }
             if (Input.GetKey(KeyCode.R)) {
                 RestartGame();
+            }
+        }
+        else if (gameState == GameState.LessLife) {
+            txtLose.gameObject.SetActive(false);
+            gameState = GameState.Play;
+            if (Player != null) {
+                Player.GetComponent<Raquete>().StartRaquete();
+            }
+            
+            if (Ball != null) {
+                Ball.GetComponent<Ball>().StartBall();
             }
         }
     }

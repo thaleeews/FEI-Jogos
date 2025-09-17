@@ -4,6 +4,8 @@ public class Ball : MonoBehaviour
 {
     private Rigidbody2D rb2d;
     public float speed = 10.0f;
+    public static Ball instance;
+    //string currentLevel = SceneManager.GetActiveScene().name;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -14,6 +16,16 @@ public class Ball : MonoBehaviour
     void Update()
     {
         
+    }
+
+    private void Awake() {
+        // Verificar se já existe uma instância
+        if (instance != null && instance != this) {
+            Destroy(gameObject); // Destruir este GameObject duplicado
+            return;
+        }
+        instance = this;
+        DontDestroyOnLoad(gameObject); // Mantém o GameController entre cenas
     }
 
     public void StartBall() {
@@ -35,13 +47,54 @@ public class Ball : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D col) {
         if(col.gameObject.tag == "Player") {
-            float x = HitFactor (transform.position, col.transform.position, col.collider.bounds.size.x);
-            Vector2 dir = new Vector2(x, 1).normalized;
-            rb2d.linearVelocity = Vector2.ClampMagnitude(dir * speed, speed);
+                float x = HitFactor (transform.position, col.transform.position, col.collider.bounds.size.x);
+                Vector2 dir = new Vector2(x, 1).normalized;
+                rb2d.linearVelocity = Vector2.ClampMagnitude(dir * speed, speed);
+            }
+            if(col.gameObject.name == "botWall") {
+                StopBall();
+                int vidas = GameController.instance.RemoveLife();
+                if (vidas <= 0) {
+                    GameController.instance.gameState = GameState.GameOver;
+                }
+                else {
+                    GameController.instance.gameState = GameState.LessLife;
+                }
+            }
+        
+        /*if (currentLevel == "Level1") {
+            if(col.gameObject.tag == "Player") {
+                float x = HitFactor (transform.position, col.transform.position, col.collider.bounds.size.x);
+                Vector2 dir = new Vector2(x, 1).normalized;
+                rb2d.linearVelocity = Vector2.ClampMagnitude(dir * speed, speed);
+            }
+            if(col.gameObject.name == "botWall") {
+                StopBall();
+                int vidas = GameController.instance.RemoveLife();
+                if (vidas <= 0) {
+                    GameController.instance.gameState = GameState.GameOver;
+                }
+                else {
+                    GameController.instance.gameState = GameState.LessLife;
+                }
+            }
         }
-        if(col.gameObject.name == "botWall") {
-            StopBall();
-            GameController.instance.gameState = GameState.GameOver;
-        }
+        else {
+            if(col.gameObject.tag == "Player") {
+                float x = HitFactor (transform.position, col.transform.position, col.collider.bounds.size.x);
+                Vector2 dir = new Vector2(x, 1).normalized;
+                rb2d.linearVelocity = Vector2.ClampMagnitude(dir * speed, speed);
+            }
+            if(col.gameObject.name == "botWall") {
+                StopBall();
+                int vidas = GameController.instance.RemoveLife();
+                if (vidas <= 0) {
+                    GameController.instance.gameState = GameState.GameOver;
+                }
+                else {
+                    GameController.instance.gameState = GameState.LessLife;
+                }
+            }
+        }*/
     }
 }
