@@ -7,8 +7,10 @@ public class GerenciadorJogo : MonoBehaviour
     public static GerenciadorJogo Instancia { get; private set; }
 
     [SerializeField] private GameObject interfaceGameOver;
+    [SerializeField] private GameObject interfaceVitoria;
     [SerializeField] private Text textoPontuacao;
     [SerializeField] private Text textoVidas;
+    [SerializeField] private Text textoBoost;
 
     private Jogador jogador;
     private Invasores invasores;
@@ -16,6 +18,9 @@ public class GerenciadorJogo : MonoBehaviour
 
     public int pontuacao { get; private set; } = 0;
     public int vidas { get; private set; } = 3;
+
+    private bool boostAtivado = false;
+    private bool vitoria = false;
 
     private void Awake()
     {
@@ -47,15 +52,34 @@ public class GerenciadorJogo : MonoBehaviour
         if (vidas <= 0 && Input.GetKeyDown(KeyCode.Return)) {
             NovoJogo();
         }
+        if (!boostAtivado && pontuacao > 40 && Input.GetKeyDown(KeyCode.S)) {
+            textoBoost.gameObject.SetActive(false);
+            jogador.velocidade += 3f;
+            boostAtivado = true;
+        }
+        if (vitoria && vidas > 0 && Input.GetKeyDown(KeyCode.Return)) {
+            NovoJogo();
+        }
     }
 
     private void NovoJogo()
     {
         interfaceGameOver.SetActive(false);
+        interfaceVitoria.SetActive(false);
+        textoBoost.gameObject.SetActive(false);
 
+        boostAtivado = false;
+        vitoria = false;
+        jogador.velocidade = 5f;
         DefinirPontuacao(0);
         DefinirVidas(3);
         NovaRodada();
+    }
+
+    private void CenaVitoria(){
+        jogador.gameObject.SetActive(false);
+        invasores.gameObject.SetActive(false);
+        interfaceVitoria.gameObject.SetActive(true);
     }
 
     private void NovaRodada()
@@ -84,6 +108,9 @@ public class GerenciadorJogo : MonoBehaviour
     {
         this.pontuacao = pontuacao;
         textoPontuacao.text = pontuacao.ToString().PadLeft(4, '0');
+        if (this.pontuacao > 40 && !boostAtivado) {
+            textoBoost.gameObject.SetActive(true);
+        }
     }
 
     private void DefinirVidas(int vidas)
@@ -112,7 +139,8 @@ public class GerenciadorJogo : MonoBehaviour
         DefinirPontuacao(pontuacao + invasor.pontuacao);
 
         if (invasores.ObterContagemVivos() == 0) {
-            NovaRodada();
+            vitoria = true;
+            CenaVitoria();
         }
     }
 
