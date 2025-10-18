@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 425b648af79edd94fbcd33b83b833761, type: 3}
+  m_Name: Test
+  m_EditorClassIdentifier: Assembly-CSharp::DialogueObject
+  dialogue:
+  - "Ol\xE1! Quem \xE9 voc\xEA?"
+  - "Bom, isso n\xE3o importa.\nVoc\xEA deve ter cuidado por aqui!"
+  - "Voc\xEA pode pular com (Space) e pular duas vezes pressionando duas vezes o
+    (Space)!"
+  - "Voc\xEA tamb\xE9m pode pular entre paredes!"
+  - "Ah, e cuidado com os inimigos!\nPule na cabe\xE7a deles para derrot\xE1-los!"
+  - "Caso eles te machuquem, voc\xEA pode comer as frutas pelo caminho!\nBoa sorte!"

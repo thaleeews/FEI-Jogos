@@ -19,13 +19,46 @@ public class PlayerCollision : MonoBehaviour
         {
             other.GetComponent<Fruit>().Collect();
         }
+        else if (other.CompareTag("VirtualHelp"))
+        {
+            other.GetComponent<DialogueUI>().OnDialogueRange(true);
+        }
+    }
+
+    private void OnTriggerExit2D(Collider2D other)
+    {
+        if (other.CompareTag("VirtualHelp"))
+        {
+            other.GetComponent<DialogueUI>().OnDialogueRange(false);
+        }
     }
 
     private void OnCollisionEnter2D(Collision2D other)
     {
-        if (other.gameObject.CompareTag("Enemy"))
+        if (GameController.Instance.CurrentGameState != GameController.GameState.Active)
+            return;
+
+        switch (other.gameObject.tag)
         {
-            CollideWithEnemy(other);
+            case "Enemy":
+                CollideWithEnemy(other);
+                break;
+
+            case "Trophy":
+                HandleTrophyCollision(other, GameController.GameState.Complete);
+                break;
+
+            case "TrophyWin":
+                HandleTrophyCollision(other, GameController.GameState.Win);
+                break;
+        }
+    }
+
+    private void HandleTrophyCollision(Collision2D other, GameController.GameState targetState)
+    {
+        if (transform.position.y >= other.transform.position.y)
+        {
+            GameController.Instance.SetGameState(targetState);
         }
     }
 

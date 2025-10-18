@@ -7,6 +7,9 @@ TagManager:
   - Ground
   - Enemy
   - Fruit
+  - Trophy
+  - TrophyWin
+  - VirtualHelp
   layers:
   - Default
   - TransparentFX
